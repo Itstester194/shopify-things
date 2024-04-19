@@ -1,0 +1,118 @@
+<div class="page-width">
+  <div class="header-content">
+    <h2>Bundle Products</h2>
+  </div>
+<div class="bundle-product grids">
+  {% for block in section.blocks %}
+    <div class="grid__items">
+      <div class="product-content" data-id="{{ block.settings.b_product.variants.first.id }}"> 
+        <img src="{{ block.settings.b_product.featured_image | img_url :'master' }}" width='200px' height="200px">
+        <h3>{{ block.settings.b_product.title }}</h3>
+         <h3>{{ block.settings.b_product.price | money }}</h3>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+  <div class="button-wrappers">
+   <div class="btn"> <button class="add-to-cart">Add to Cart</button></div>
+  </div>
+</div>
+<style>
+.page-width .header-content  h2 {
+    text-align: center;
+    font-size: xxx-large;
+    font-weight: 700;
+}
+  .bundle-product.grids {
+    display: flex;
+    justify-content: center;
+}
+  .grid__items {
+    background-color: lightgray;
+    border: 1px solid gray;
+    margin: 10px;
+    padding: 10px;
+}
+  .btn {
+    background-color: darkgray;
+    width: 135px;
+    height: 39px;
+    /* position: relative; */
+    margin: auto;
+}
+  button.add-to-cart {
+    background: lightgray;
+    width: 100%;
+    height: 100%;
+    color: black;
+    font-size: initial;
+    font-weight: 700;
+}
+  .button-wrappers {
+    margin: 10px;
+}
+  @media screen and (min-width: 320px) and (max-width: 768px) {
+    .bundle-product.grids {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+}
+
+@media screen and (min-width: 320px) and (max-width: 768px) {
+    .bundle-product.grids {
+        display: flex;
+        justify-content: center;
+        flex-direction: column;
+    }
+}
+
+  
+</style>
+<script>
+  $(document).ready(function(){
+    $('.add-to-cart').click(function(){
+      var bindleproduct =[];
+      $('.product-content').each(function(){
+        var variant_id=$(this).attr('data-id');
+        bindleproduct.push({id: variant_id, quantity: 1});
+      });
+      console.log(bindleproduct);
+      $.ajax({
+       type:"post",
+        url :"cart/add.js",
+        data:{
+         items: bindleproduct 
+        },
+        success: function(){
+          console.log("added to cart");
+        }
+        
+      });
+    });
+  });
+</script>
+{% schema %}
+  {
+    "name": "Bundle Product",
+    "settings": [],
+    "blocks": [
+      {
+        "type": "bundle-product",
+        "name":"bundle-products",
+        "settings": [
+          {
+            "type": "product",
+            "id": "b_product",
+            "label": "Bundle Product"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Bundle Product"
+      }
+    ]
+  }
+{% endschema %}
