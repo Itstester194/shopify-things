@@ -1,0 +1,139 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<div class="11 custom-pro">
+      <div class=" page-width custom-pro-inner">
+    {% assign products = section.settings.product %}
+      <div class="product-content">
+        <img src="{{ products.featured_image | img_url: 'master' }}" >        
+      </div>
+      <div class="product-all-data">
+        <h3>{{ products.title }}</h3>
+      <div class="price">  <h2 class="price-title">Price :</h2>  <h3 class="title-title">{{ products.price | money }}</h3></div>
+       <div class="product-variantss">
+        <select class="selectvariant">
+          {% for variant in products.variants %}
+            {% if forloop.index == 1 %}
+           <option value="">Select Variant</option>
+              {% endif %}
+            <option value="{{ variant.id }}">{{ variant.title }}</option>
+              
+          {% endfor %}
+        </select>
+       </div>
+        <button class="add-to-cart">Add to cart</button>
+      </div>
+  </div>
+</div>
+<script>
+  $(document).ready(function(){
+       $('.selectvariant').change(function() {
+          let selectedValue = $(this).val();
+                alert(selectedValue);
+       $(".add-to-cart").text("Add to cart");
+    $('.add-to-cart').click(function(){
+      $.ajax({
+        type: "post",
+        url :"cart/add.js",
+        data:{
+          id :selectedValue,
+          quantity :1
+        },
+        success: function(){
+          console.log("product added to cart");
+          $(".add-to-cart").text("Added to cart");
+          selectedValue = "";
+        }    
+      });
+ }); 
+          });
+  });  
+
+  </script>
+
+{% schema %}
+{
+  "name": "Cst Featured Pro2",
+  "settings": [
+    {
+      "type": "product",
+      "id": "product",
+      "label": "Select product"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Cst Featured Pro2"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+ .custom-pro-inner {
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.custom-pro {
+    /* background: lightgray; */
+    width: 100%;
+    height: 500px;
+}
+.custom-pro-inner img {
+    width: 96%;
+    height: 50%;
+}
+.custom-pro-inner .product-all-data {
+    width: 50%;
+    height: 100%;
+}
+.product-content img {
+    height: 67% !important;
+}
+.custom-pro-inner h3 {
+    font-size: 42px;
+    font-weight: bold;
+}
+.custom-pro-inner button.add-to-cart {
+    margin-top: 32px;
+    font-size: 27px;
+    background-color: #000;
+    color: #fff;
+    padding: 7px 24px 9px;
+}
+  .custom-pro-inner .product-all-data {
+    width: 37%;
+    margin-left: 73px;
+    height: 100%;
+}
+h2.price-title {
+    font-size: 31px;
+    color: gray;
+    font-weight: bold;
+}
+
+h3.title-title {
+    font-size: 30px;
+}
+  .product-variantss {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-column: repeat(3 fr, 1fr);
+}
+
+.varinat-wrapper {
+    border: 1px solid pink;
+    background-size: contain;
+    width: 80px;
+    height: 100px;
+    border-radius: 47px;
+}
+
+input[type="radio"] {
+    border: none;
+    width: 37%;
+    height: 29%;
+}
+
+
+</style>
