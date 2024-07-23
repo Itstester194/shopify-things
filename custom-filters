@@ -1,0 +1,299 @@
+<div id="filters-container">
+  <div class="PageHeader custom-page-header">
+    <h1 class="SectionHeader__Heading Heading u-h1">
+      {%- if template == 'list-collections' -%}
+        {{- 'collection_list.general.title' | t -}}
+      {%- else -%}
+        {{- page.title -}}
+      {%- endif -%}
+    </h1>
+  </div>
+  <button id="toggle-filters" class="filter-toggle-btns">FILTER +</button>
+  <div id="filters-contents" class="filters-contents product-list_conatiners grid_list__products" style="display: none;">
+
+    <div class="colors filter-group product_grid Grid__Cell 1/2--phone 1/2--tablet 1/4--lap-and-up">
+          <h3 class="mb-filter_titles color active" data-value="color">COLOUR</h3>
+      <div class="grid-container">
+      {% assign colors = 'saddle,walnut,sand,taupe,noir,granite,forest,powder,biscuit,storm,melange,brute,creme,beton,sienna,naturel' | split: ',' %}
+      {% for color in colors %}
+        {% assign tag = 'colour_' | append: color %}
+        {% assign color_swatch_name = color | handle | append: '.png' %}
+        {% assign color_swatch_image = images[color_swatch_name] %}
+        <div class="color-wrp">
+          <input type="checkbox" id="{{ tag }}" value="{{ tag }}" data-value="{{ color }}" class="color-filters">
+          <label for="{{ tag }}">
+            <span class="color-dot" style="{% if color_swatch_image != blank %}background-image: url({{ color_swatch_image | img_url: '64x64' }}){% endif %}"></span>
+            <span class="color-name">{{ color | capitalize }}</span>
+          </label>
+        </div>
+      {% endfor %}
+    </div>
+    </div>
+
+    <div class="filter-group product_grid Grid__Cell 1/2--phone 1/2--tablet 1/4--lap-and-up" data-value="category">
+      <h3 class="dk-title bold-text">CATEGORY</h3>
+      {% assign categories = 'collar,harness,leash,accessories,bag,ready-to-wear,beaute' | split: ',' %}
+      <div class="category_values filter-content">
+        {% for category in categories %}
+          {% assign tag = 'category_' | append: category %}
+          <input type="checkbox" id="{{ tag }}" value="{{ tag }}" data-value="{{ category }}" class="category-filters">
+          <label for="{{ tag }}">{{ category | replace: '_', ' ' | capitalize }}</label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="filter-group product_grid Grid__Cell 1/2--phone 1/2--tablet 1/4--lap-and-up" data-value="objects">
+      <h3 class="dk-title bold-text">OBJECTS</h3>
+      {% assign objects = 'for_pets,for_humans' | split: ',' %}
+      <div class="object_values filter-content">
+        {% for object in objects %}
+          {% assign tag = 'objects_' | append: object %}
+          <input type="checkbox" id="{{ tag }}" value="{{ tag }}" data-value="{{ object }}" class="object-filters">
+          <label for="{{ tag }}">{{ object | replace: '_', ' ' | capitalize }}</label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <div class="filter-group" data-value="sizing">
+      <h3 class="dk-title">SIZING</h3>
+      {% assign sizes = 'for_dainty_breeds,for_grandiose_breeds' | split: ',' %}
+      <div class="size_values filter-content">
+        {% for size in sizes %}
+          {% assign tag = 'size_' | append: size %}
+          <input type="checkbox" id="{{ tag }}" value="{{ tag }}" data-value="{{ size }}" class="size-filters">
+          <label for="{{ tag }}">{{ size | replace: '_', ' ' | capitalize }}</label>
+        {% endfor %}
+      </div>
+    </div>
+      <div class="filter-btn-wrapper">
+    <button id="done-filters" class="done-btn Button Button--secondary">Done</button>
+    <button id="clear-filters" class="clear-filters-btn Button Button--secondary">Clear All</button>
+  </div>
+  </div>
+
+
+  <div class="product_list_main">
+    <div class="product-list_conatiners grid_list__products">
+      {% for product in collections.all.products %}
+        {% unless product.tags contains 'coming_soon' %}
+          <div class="product_grid Grid__Cell 1/2--phone 1/2--tablet 1/4--lap-and-up hidden"
+               data-colour="{% for variant in product.variants %}{% if variant.title contains 'SAND' or variant.title contains 'SADDLE' or variant.title contains 'NOIR' or variant.title contains 'WALNUT' or variant.title contains 'TAUPE' or variant.title contains 'GRANITE' or variant.title contains 'FOREST' or variant.title contains 'BISCUIT' or variant.title contains 'SAFFRON' or variant.title contains 'POWDER' or variant.title contains 'STORM' or variant.title contains 'MÉLANGE' or variant.title contains 'BRUTE' or variant.title contains 'CREME' or variant.title contains 'BETON' or variant.title contains 'SIENNA' or variant.title contains 'NATUREL' %}{{ variant.title | handleize | split: '-' | first }}{% unless forloop.last %},{% endunless %}{% endif %}{% endfor %}"
+               data-category="{{ product.type | handleize }}"
+               data-object="{% if product.tags contains 'For Humans' %}for_humans{% else %}for_pets{% endif %}"
+               data-size="{% if product.tags contains 'For Dainty Breeds' %}for_dainty_breeds{% endif %}{% if product.tags contains 'For Grandiose Breeds' %},for_grandiose_breeds{% endif %}"
+            >
+            {%- render 'product-item',
+              product: product,
+              show_product_info: true,
+              show_vendor: false,
+              show_color_swatch: true,
+              show_labels: true
+            -%}
+          </div>
+        {% endunless %}
+      {% endfor %}
+    </div>
+  </div>
+</div>
+<script>
+  $(document).ready(function() {
+  $('.product_list_main .product_grid').hide();
+
+  $("#toggle-filters").on('click', function() {
+    let togglefilters = $(this).text();
+    if(togglefilters== "FILTER +"){
+      $(this).text('FILTER -');
+    }else{
+       $(this).text('FILTER +');
+    }
+    $('#filters-contents').toggle();
+  });
+
+  function filterProducts() {
+    var selectedColors = [];
+    $('.color-filters:checked').each(function() {
+      selectedColors.push($(this).data('value'));
+    });
+
+    var selectedCategories = [];
+    $('.category-filters:checked').each(function() {
+         $('.CollectionList-main').hide();
+      selectedCategories.push($(this).data('value'));
+    });
+
+    var selectedObjects = [];
+    $('.object-filters:checked').each(function() {
+         $('.CollectionList-main').hide();
+      selectedObjects.push($(this).data('value'));
+    });
+
+    var selectedSizes = [];
+    $('.size-filters:checked').each(function() {
+         $('.CollectionList-main').hide();
+      selectedSizes.push($(this).data('value'));
+    });
+
+    $('.product_list_main .product_grid').each(function() {
+      var productColors = $(this).data('colour') ? $(this).data('colour').split(',') : [];
+      var productCategory = $(this).data('category');
+      var productObject = $(this).data('object');
+      var productSizes = $(this).data('size') ? $(this).data('size').split(',') : [];
+
+      var colorMatch = selectedColors.length === 0 || selectedColors.some(color => productColors.includes(color));
+      var categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(productCategory);
+      var objectMatch = selectedObjects.length === 0 || selectedObjects.includes(productObject);
+      var sizeMatch = selectedSizes.length === 0 || selectedSizes.some(size => productSizes.includes(size));
+
+      if (colorMatch && categoryMatch && objectMatch && sizeMatch) {
+        $(this).show();
+      } else {
+        $(this).hide();
+      }
+    });
+  }
+
+  $('.color-filters, .category-filters, .object-filters, .size-filters').on('change', function() {
+    if ($(this).is(':checked')) {
+      $(this).next('label').addClass('selected');
+    } else {
+      $(this).next('label').removeClass('selected');
+    }
+    filterProducts();
+  });
+
+  $('#done-filters').on('click', function() {
+    $('#filters-contents').hide();
+  });
+
+  $('#clear-filters').on('click', function() {
+       $('.CollectionList-main').show();
+    $('.color-filters, .category-filters, .object-filters, .size-filters').prop('checked', false).next('label').removeClass('selected');
+    $('.product_list_main .product_grid').hide();
+  });
+});
+
+</script>
+<style>
+  .product-list_conatiners.grid_list__products {
+    margin-top: 20px;
+}
+  #filters-container {
+  font-family: 'Open Sans', sans-serif;
+  margin-bottom: 20px;
+}
+
+.filter-toggle-btns {
+    font-family: 'Pano-Light';
+    background-color: #fff;
+    color: 000;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    font-size: 21px;
+    transition: background-color 0.3s ease;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
+
+.filters-contents {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 5px;
+}
+
+.filter-group {
+  margin-bottom: 30px;
+  flex: 1 1 30%;
+}
+
+.filter-group h3 {
+    font-family: 'Pano-Light';
+    font-size: 14px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.filter-group input[type="checkbox"] {
+  display: none;
+}
+
+.filter-group label {
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  text-transform: capitalize;
+  color: #333;
+  font-size: 14px;
+}
+
+.filter-group label.selected {
+  font-weight: bold;
+}
+
+.color-dot {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-size: cover;
+  margin-right: 5px;
+}
+
+.color-wrp {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.color-name {
+  vertical-align: middle;
+}
+.filter-btn-wrapper {
+  width:100%;
+    display: flex;
+    margin-top: 20px;
+    /* margin-right: 10px; */
+    flex-direction: row-reverse;
+    align-content: stretch;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+}
+
+.done-btn, .clear-filters-btn {
+      margin: 10px;
+  background-color: #000;
+  color: #fff;
+  padding: 10px 20px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease;
+  text-transform: uppercase;
+}
+
+.done-btn:hover, .clear-filters-btn:hover {
+  background-color: #444;
+}
+
+.product-list_conatiners {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.hidden {
+  display: none;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 10px;
+}
+
+</style>
