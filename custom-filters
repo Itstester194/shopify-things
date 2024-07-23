@@ -297,3 +297,15 @@
 }
 
 </style>
+
+
+
+/* produt item */
+
+<div class="ProductItem{% if use_horizontal %} ProductItem--horizontal{% endif %}" 
+  data-new="{{ product.tags }}, {{ product.type }}"
+  data-category="{{ product.type | handleize }}" 
+  data-colour="{% for variant in product.variants %}{% if variant.title contains 'SAND' or variant.title contains 'SADDLE' or variant.title contains 'NOIR' or variant.title contains 'WALNUT' or variant.title contains 'TAUPE' or variant.title contains 'GRANITE' or variant.title contains 'FOREST' or variant.title contains 'BISCUIT' or variant.title contains 'SAFFRON' or variant.title contains 'POWDER' or variant.title contains 'STORM' or variant.title contains 'MÉLANGE' or variant.title contains 'BRUTE' or variant.title contains 'CREME' or variant.title contains 'BETON' or variant.title contains 'SIENNA' or variant.title contains 'NATUREL' %}{{ variant.title | handleize | split: '-' | first }}{% unless forloop.last %},{% endunless %}{% endif %}{% endfor %}"
+  data-for-humans="{{ custom.objects }}"
+  data-size="{% if product.tags contains 'For Dainty Breeds' %}for_dainty_breeds{% endif %}{% if product.tags contains 'For Grandiose Breeds' %},for_grandiose_breeds{% endif %}"
+>
